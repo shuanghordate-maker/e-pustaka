@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Pustaka | Toko Ebook Digital & Admin Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Glassmorphism effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .blob {
+            position: absolute;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: floatBubble 12s infinite alternate ease-in-out;
+        }
+        @keyframes floatBubble {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.1); }
+            100% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        /* Transitions */
+        .page-view {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .page-view.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c084fc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 relative overflow-x-hidden min-h-screen pb-16">
+
+    <!-- Background Abstract Blobs -->
+    <div class="blob bg-purple-300 w-[450px] h-[450px] rounded-full top-[-10%] left-[-5%]"></div>
+    <div class="blob bg-indigo-300 w-[500px] h-[500px] rounded-full bottom-[-10%] right-[-10%]" style="animation-delay: 3s;"></div>
+    <div class="blob bg-fuchsia-200 w-[300px] h-[300px] rounded-full top-[40%] left-[30%]" style="animation-delay: 5s;"></div>
+
+    <!-- NAVBAR GLASSMORPHISM -->
+    <nav class="fixed w-full z-50 glass shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigate('landing')">
+                    <div class="bg-gradient-to-tr from-purple-600 to-indigo-600 p-2 rounded-xl mr-2.5 shadow-md shadow-purple-200">
+                        <i class="fas fa-book-open text-white text-lg"></i>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-indigo-700">E-Pustaka</span>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center space-x-4">
+                    <!-- Loading Indicator -->
+                    <div id="global-loader" class="hidden items-center space-x-2 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100">
+                        <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-xs font-semibold text-purple-700">Memuat data...</span>
+                    </div>
+                    
+                    <!-- Guest Navigation (Not logged in) -->
+                    <div id="nav-guest" class="flex items-center space-x-2">
+                        <button onclick="navigate('auth'); setAuthMode(true)" class="text-slate-600 hover:text-purple-600 font-semibold px-4 py-2 rounded-xl transition text-sm">Masuk</button>
+                        <button onclick="navigate('auth'); setAuthMode(false)" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-purple-200 hover:shadow-xl transition transform hover:-translate-y-0.5">Daftar</button>
+                    </div>
+
+                    <!-- User / Admin Navigation (Logged in) -->
+                    <div id="nav-user" class="hidden flex items-center space-x-4">
+                        <div class="flex flex-col text-right hidden md:block">
+                            <span id="user-greeting" class="font-bold text-slate-800 text-sm"></span>
+                            <span id="user-role-badge" class="text-[10px] font-semibold text-purple-600 uppercase tracking-widest"></span>
+                        </div>
+                        
+                        <!-- Back to Admin Dashboard Shortcut -->
+                        <button id="btn-admin-dashboard" onclick="navigate('admin')" class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-2 rounded-xl text-xs transition items-center space-x-1">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Menu Admin</span>
+                        </button>
+
+                        <!-- Cart Button (Only for standard users) -->
+                        <button id="btn-cart" onclick="toggleCart()" class="relative p-2.5 bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-600 rounded-xl transition">
+                            <i class="fas fa-shopping-cart text-lg"></i>
+                            <span id="cart-badge" class="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold leading-none text-white bg-rose-500 rounded-full shadow-md scale-95">0</span>
+                        </button>
+
+                        <button onclick="logout()" class="p-2.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition" title="Keluar Akun">
+                            <i class="fas fa-sign-out-alt text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[85vh]">
+
+        <!-- VIEW 1: LANDING PAGE -->
+        <div id="view-landing" class="page-view active">
+            <!-- Hero Banner -->
+            <div class="flex flex-col lg:flex-row items-center py-10 lg:py-16 gap-12">
+                <div class="lg:w-1/2 text-center lg:text-left">
+                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 mb-6">
+                        <i class="fas fa-star mr-1.5 text-amber-500"></i> Platform Buku Digital No #1 Indonesia
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight text-slate-900 tracking-tight">
+                        Temukan Ebook <br class="hidden sm:inline">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600">
+                            Eksklusif & Berkualitas
+                        </span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        Perbanyak ilmu dan wawasan Anda dengan ribuan koleksi ebook premium dari penulis terbaik dunia. Praktis, murah, dan dapat dibaca di mana saja!
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <button onclick="scrollToProducts()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-purple-200 transition transform hover:-translate-y-1">
+                            <i class="fas fa-compass mr-2"></i> Jelajahi Katalog
+                        </button>
+                        <button onclick="navigate('auth'); setAuthMode(false)" class="bg-white hover:bg-slate-100 text-slate-800 font-bold py-3.5 px-8 rounded-xl border border-slate-200 shadow-sm transition">
+                            Buat Akun Gratis
+                        </button>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-3xl rotate-3 scale-102 opacity-20 blur-md"></div>
+                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80" alt="E-Pustaka Banner" class="rounded-3xl shadow-2xl relative z-10 max-h-[420px] object-cover border-4 border-white transform hover:rotate-0 transition duration-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Sellers/Product Grid -->
+            <div id="product-section" class="mt-16 pt-8 border-t border-slate-100">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Katalog Buku Terbaru</h2>
+                        <p class="text-slate-500 mt-1">Ebook terlaris dan paling banyak direkomendasikan bulan ini</p>
+                    </div>
+                    <div class="relative w-full md:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" oninput="searchProducts(this.value)" placeholder="Cari judul ebook..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                    </div>
+                </div>
+                <div id="landing-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Products rendered via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: AUTHENTICATION (Login/Register) -->
+        <div id="view-auth" class="page-view">
+            <div class="flex justify-center items-center py-12">
+                <div class="glass-card p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex p-3 bg-purple-100 rounded-2xl text-purple-600 mb-4">
+                            <i class="fas fa-lock text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-slate-900" id="auth-title">Masuk ke Akun Anda</h2>
+                        <p class="text-slate-500 text-sm mt-1" id="auth-subtitle">Kelola pustaka digital pribadi Anda</p>
+                    </div>
+                    
+                    <form id="auth-form" onsubmit="handleAuth(event)">
+                        <div class="mb-4">
+                            <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Username</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="auth-username" placeholder="Masukkan username" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60">
+                            </div>
+                            <p class="text-xs text-indigo-600 mt-1.5 font-medium"><i class="fas fa-info-circle mr-1"></i> Gunakan "admin" untuk masuk sebagai Admin.</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input type="password" id="auth-password" placeholder="Masukkan password" required class="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60">
+                                <!-- Password Visibility Toggle Button -->
+                                <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-purple-600 transition focus:outline-none">
+                                    <i id="password-toggle-icon" class="fas fa-eye text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-200 hover:shadow-xl transition transform hover:-translate-y-0.5">
+                            <span id="auth-btn-text">Masuk</span>
+                        </button>
+                    </form>
+
+                    <div class="mt-6 pt-6 border-t border-slate-100 text-center text-sm">
+                        <span id="auth-switch-text" class="text-slate-500">Belum memiliki akun?</span>
+                        <button onclick="toggleAuthMode()" class="text-purple-600 font-bold hover:underline ml-1" id="auth-switch-btn">Daftar sekarang</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: USER DASHBOARD -->
+        <div id="view-user" class="page-view">
+            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-3xl p-8 text-white mb-10 shadow-xl shadow-purple-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+                <div class="relative z-10 max-w-xl">
+                    <h2 class="text-3xl font-extrabold tracking-tight">Selamat Datang di Portal Buku!</h2>
+                    <p class="text-purple-200 mt-2 text-sm sm:text-base">Mulai tambahkan buku pilihan Anda ke keranjang belanja, dapatkan harga diskon spesial pengguna terdaftar!</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800">Daftar Produk Ebook</h3>
+                    <p class="text-sm text-slate-500">Pilih ebook premium dan langsung bayar melalui keranjang</p>
+                </div>
+            </div>
+
+            <div id="user-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Products list in user dashboard -->
+            </div>
+        </div>
+
+        <!-- VIEW 4: ADMIN DASHBOARD -->
+        <div id="view-admin" class="page-view">
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+                
+                <!-- Admin Left Sidebar Navigation -->
+                <div class="w-full lg:w-64 glass-card rounded-2xl p-4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible shrink-0">
+                    <div class="hidden lg:block p-3 border-b mb-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Menu Navigasi</span>
+                    </div>
+                    <button onclick="switchAdminTab('overview')" id="tab-btn-overview" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition shrink-0 bg-purple-600 text-white">
+                        <i class="fas fa-chart-line text-base"></i>
+                        <span>Ringkasan & Stat</span>
+                    </button>
+                    <button onclick="switchAdminTab('post-book')" id="tab-btn-post-book" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition shrink-0 text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-file-upload text-base"></i>
+                        <span>Posting Ebook Baru</span>
+                    </button>
+                    <button onclick="switchAdminTab('users-list')" id="tab-btn-users-list" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition shrink-0 text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-users text-base"></i>
+                        <span>Daftar Pengguna</span>
+                    </button>
+                    <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition shrink-0 text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-receipt text-base"></i>
+                        <span>Pesanan Masuk</span>
+                    </button>
+                </div>
+
+                <!-- Admin Main Panel -->
+                <div class="flex-grow w-full">
+
+                    <!-- TAB 1: OVERVIEW -->
+                    <div id="admin-tab-overview" class="admin-tab-content block space-y-8">
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pengguna</p>
+                                        <h3 id="stat-total-users" class="text-3xl font-extrabold mt-2 text-slate-900">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-purple-100 rounded-xl text-purple-600"><i class="fas fa-users text-lg"></i></div>
+                                </div>
+                                <div class="text-xs text-slate-500 mt-4"><i class="fas fa-circle-notch text-purple-500 mr-1 animate-spin hidden" id="user-sync-loader"></i> Terkoneksi Google Sheet</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Buku Dijual</p>
+                                        <h3 id="stat-total-books" class="text-3xl font-extrabold mt-2 text-slate-900 font-sans">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-indigo-100 rounded-xl text-indigo-600"><i class="fas fa-book text-lg"></i></div>
+                                </div>
+                                <div class="text-xs text-slate-500 mt-4">Tampil langsung di katalog</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pesanan</p>
+                                        <h3 id="stat-total-orders" class="text-3xl font-extrabold mt-2 text-slate-900">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-emerald-100 rounded-xl text-emerald-600"><i class="fas fa-shopping-basket text-lg"></i></div>
+                                </div>
+                                <div class="text-xs text-slate-500 mt-4">Transaksi berhasil dicatat</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Estimasi Omset</p>
+                                        <h3 id="stat-total-revenue" class="text-xl font-extrabold mt-3 text-emerald-600">Rp 0</h3>
+                                    </div>
+                                    <div class="p-3 bg-teal-100 rounded-xl text-teal-600"><i class="fas fa-wallet text-lg"></i></div>
+                                </div>
+                                <div class="text-xs text-slate-500 mt-4">Akumulasi penjualan</div>
+                            </div>
+                        </div>
+
+                        <!-- Shortcut Card to actions -->
+                        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl">
+                            <div>
+                                <h4 class="text-lg font-bold">Butuh memposting buku atau memeriksa pengguna baru?</h4>
+                                <p class="text-indigo-200 text-xs mt-1">Anda sekarang dapat mengunggah file gambar cover, mengatur harga, dan memantau list pengguna secara langsung melalui panel di kiri.</p>
+                            </div>
+                            <button onclick="switchAdminTab('post-book')" class="bg-white hover:bg-slate-100 text-indigo-900 font-bold px-5 py-2.5 rounded-xl text-xs transition uppercase tracking-wider shrink-0">Mulai Posting <i class="fas fa-plus ml-1.5"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: POST & MANAGE EBOOKS -->
+                    <div id="admin-tab-post-book" class="admin-tab-content hidden space-y-6">
+                        <!-- Post Ebook Form Card -->
+                        <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                            <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fas fa-plus-circle text-purple-600 mr-1.5"></i> Posting Ebook Baru</h3>
+                            
+                            <!-- Form Tambah Produk (Terbaru dengan Fitur Upload File) -->
+                            <form id="add-product-form" onsubmit="handleAddProduct(event)" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4 mb-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-bold text-purple-700 uppercase mb-1">Judul Buku</label>
+                                    <input type="text" id="new-title" placeholder="Contoh: Belajar JavaScript" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 bg-white">
+                                </div>
+                                <div class="w-full md:w-48">
+                                    <label class="block text-xs font-bold text-purple-700 uppercase mb-1">Harga (Rp)</label>
+                                    <input type="number" id="new-price" placeholder="75000" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 bg-white">
+                                </div>
+                                <div class="w-full md:w-64">
+                                    <label class="block text-xs font-bold text-purple-700 uppercase mb-1">Sampul (Pilih Salah Satu)</label>
+                                    <div class="space-y-2">
+                                        <!-- Pilihan 1: Upload File -->
+                                        <input type="file" id="new-image-file" accept="image/*" onchange="handleImageSelection('file')" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200">
+                                        <!-- Pilihan 2: Input URL -->
+                                        <input type="url" id="new-image-url" placeholder="Atau tempel URL Gambar di sini" oninput="handleImageSelection('url')" class="w-full px-3 py-1.5 text-xs border rounded-lg focus:ring-2 focus:ring-purple-500 bg-white">
+                                    </div>
+                                </div>
+                                <!-- Live Preview Kecil -->
+                                <div class="hidden md:block w-14 h-20 bg-gray-200 rounded border border-gray-300 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                    <img id="admin-product-preview" src="" class="w-full h-full object-cover hidden">
+                                    <i id="admin-preview-icon" class="fas fa-image text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <button type="submit" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow transition flex items-center justify-center">
+                                        <i class="fas fa-plus mr-2"></i> Tambah
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Ebooks Catalog Management List -->
+                        <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                            <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fas fa-list text-purple-600 mr-1.5"></i> Pengaturan Katalog Ebook</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100/80 text-slate-700 text-xs font-bold uppercase tracking-wider">
+                                            <th class="p-3 border-b">Gambar</th>
+                                            <th class="p-3 border-b">Judul Ebook</th>
+                                            <th class="p-3 border-b">Harga</th>
+                                            <th class="p-3 border-b text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-products-table" class="text-sm divide-y">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: USERS LIST -->
+                    <div id="admin-tab-users-list" class="admin-tab-content hidden space-y-6">
+                        <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-users-cog text-purple-600 mr-1.5"></i> Pengawasan & Daftar Pengguna</h3>
+                                    <p class="text-xs text-slate-500 mt-1">Menampilkan data akun pengguna terdaftar dari Spreadsheets</p>
+                                </div>
+                                <button onclick="loadUsers()" class="flex items-center space-x-1.5 bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold transition">
+                                    <i class="fas fa-sync-alt" id="user-refresh-icon"></i>
+                                    <span>Segarkan Data</span>
+                                </button>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100/80 text-slate-700 text-xs font-bold uppercase tracking-wider">
+                                            <th class="p-3 border-b">No</th>
+                                            <th class="p-3 border-b">Username Pengguna</th>
+                                            <th class="p-3 border-b">Hak Akses / Role</th>
+                                            <th class="p-3 border-b text-center">Tanggal Pendaftaran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-users-table" class="text-sm divide-y">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: ORDERS HISTORY -->
+                    <div id="admin-tab-orders" class="admin-tab-content hidden space-y-6">
+                        <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
+                            <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fas fa-shopping-bag text-purple-600 mr-1.5"></i> Riwayat Transaksi Masuk</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100/80 text-slate-700 text-xs font-bold uppercase tracking-wider">
+                                            <th class="p-3 border-b">ID Order</th>
+                                            <th class="p-3 border-b">Pembeli</th>
+                                            <th class="p-3 border-b">Buku Yang Dibeli</th>
+                                            <th class="p-3 border-b">Total Bayar</th>
+                                            <th class="p-3 border-b">Tanggal Transaksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-orders-table" class="text-sm divide-y">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL KERANJANG -->
+    <div id="cart-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 justify-center items-center flex hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden flex flex-col max-h-[85vh] border border-slate-100">
+            <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center">
+                    <i class="fas fa-shopping-cart text-purple-600 mr-2"></i> Keranjang Pilihan Anda
+                </h3>
+                <button onclick="toggleCart()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items" class="p-5 flex-grow overflow-y-auto space-y-4">
+                <!-- Shopping items inside cart rendered via JS -->
+            </div>
+
+            <div class="p-5 border-t bg-slate-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span class="text-slate-600">Total Pembayaran:</span>
+                    <span id="cart-total" class="text-purple-600">Rp 0</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition">
+                    <i class="fas fa-check-circle mr-1.5"></i> Selesaikan Pesanan (Checkout)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST ALERT NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-[1000] invisible min-w-[280px] text-white text-sm font-semibold rounded-2xl px-5 py-4 shadow-xl transition-all duration-300 transform translate-y-4">
+        Notifikasi
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC SECTION                   -->
+    <!-- ========================================== -->
+    <script>
+        // ==========================================
+        // 1. CONFIGURATION (Google Apps Script)
+        // ==========================================
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUISakIz7buCazJIHR0dv9z2DCOgdUO_AV2IzU9VT3eRnMu2oedORiHom8Js1aQqEo/exec"; 
+        
+        // ==========================================
+        // 2. APP STATE (In-Memory Data)
+        // ==========================================
+        let isLoginMode = true;
+        let currentUser = null; 
+        let cart = [];
+        let products = [];
+        let orders = [];
+        let users = []; 
+        let isLoading = false;
+
+        // Image handler states (Global variables)
+        let selectedImageType = null;
+        let base64ImageData = "";
+
+        // Offline Mock Data (Fallback)
+        const MOCK_PRODUCTS = [
+            { id: "1", title: "Rahasia Sukses Coding dengan Javascript", price: 65000, image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=300&q=80" },
+            { id: "2", title: "Panduan Modern UI/UX Design & Figma", price: 89000, image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=300&q=80" },
+            { id: "3", title: "Membangun SaaS Berbasis Framework Web", price: 120000, image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=300&q=80" },
+            { id: "4", title: "Menjadi Konten Kreator Profesional", price: 45000, image: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&w=300&q=80" }
+        ];
+
+        const MOCK_USERS = [
+            { username: "admin", role: "admin", date: "2026-01-10" },
+            { username: "budi_sanjaya", role: "user", date: "2026-03-12" },
+            { username: "clara_putri", role: "user", date: "2026-04-01" },
+            { username: "deni_suherman", role: "user", date: "2026-05-20" }
+        ];
+
+        const MOCK_ORDERS = [
+            { orderId: "ORD-9921", username: "budi_sanjaya", items: "Rahasia Sukses Coding dengan Javascript (x1)", total: 65000, date: "2026-03-12 14:22" },
+            { orderId: "ORD-9934", username: "clara_putri", items: "Panduan Modern UI/UX Design & Figma (x1), Menjadi Konten Kreator Profesional (x1)", total: 134000, date: "2026-04-02 09:10" }
+        ];
+
+        // ==========================================
+        // 3. UTILITY FUNCTIONS
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-emerald-500 to-teal-600";
+            } else if (type === 'error') {
+                toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-rose-500 to-red-600";
+            } else {
+                toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-purple-500 to-indigo-600";
+            }
+            
+            toast.classList.remove('invisible', 'translate-y-4');
+            toast.classList.add('visible', 'translate-y-0');
+            
+            setTimeout(() => {
+                toast.classList.add('invisible', 'translate-y-4');
+                toast.classList.remove('visible', 'translate-y-0');
+            }, 3500);
+        }
+
+        function setLoading(status) {
+            isLoading = status;
+            const loader = document.getElementById('global-loader');
+            if (status) {
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+            } else {
+                loader.classList.remove('flex');
+                loader.classList.add('hidden');
+            }
+        }
+
+        async function fetchGAS(payloadData) {
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                console.warn("GAS URL belum diatur secara benar. Berjalan dalam mode demo.");
+                return { success: false, mode: 'mock' };
+            }
+
+            setLoading(true);
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payloadData)
+                });
+                const result = await response.json();
+                setLoading(false);
+                return result;
+            } catch (error) {
+                setLoading(false);
+                console.error("CORS / GAS Fetch Error:", error);
+                return { success: false, error: error };
+            }
+        }
+
+        // ==========================================
+        // 4. SPA ROUTING & TABS
+        // ==========================================
+        function navigate(viewId) {
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) {
+                target.classList.add('active');
+            }
+
+            const btnAdmin = document.getElementById('btn-admin-dashboard');
+            if (currentUser && currentUser.role === 'admin' && viewId !== 'admin') {
+                btnAdmin.classList.remove('hidden');
+                btnAdmin.classList.add('flex');
+            } else {
+                btnAdmin.classList.add('hidden');
+                btnAdmin.classList.remove('flex');
+            }
+
+            if (viewId === 'landing' || viewId === 'user') {
+                loadProducts();
+            }
+            if (viewId === 'admin') {
+                loadProducts();
+                loadUsers();
+                loadOrders();
+            }
+        }
+
+        function updateNavbar() {
+            const guestNav = document.getElementById('nav-guest');
+            const userNav = document.getElementById('nav-user');
+            const btnCart = document.getElementById('btn-cart');
+            const greeting = document.getElementById('user-greeting');
+            const badge = document.getElementById('user-role-badge');
+
+            if (currentUser) {
+                guestNav.classList.add('hidden');
+                userNav.classList.remove('hidden');
+                greeting.textContent = `Hai, ${currentUser.username}`;
+                badge.textContent = currentUser.role;
+
+                if (currentUser.role === 'admin') {
+                    btnCart.classList.add('hidden');
+                } else {
+                    btnCart.classList.remove('hidden');
+                }
+            } else {
+                guestNav.classList.remove('hidden');
+                userNav.classList.add('hidden');
+            }
+        }
+
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            document.getElementById(`admin-tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            activeBtn.classList.add('bg-purple-600', 'text-white');
+        }
+
+        // ==========================================
+        // 5. SECURITY, AUTHENTICATION & PASSWORD EYE
+        // ==========================================
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('auth-password');
+            const toggleIcon = document.getElementById('password-toggle-icon');
+            if (passwordInput && toggleIcon) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            }
+        }
+
+        function setAuthMode(isLogin) {
+            isLoginMode = isLogin;
+            document.getElementById('auth-title').textContent = isLogin ? "Masuk ke Akun Anda" : "Pendaftaran Akun Baru";
+            document.getElementById('auth-subtitle').textContent = isLogin ? "Kelola pustaka digital pribadi Anda" : "Mulai bergabung dan rasakan ribuan ilmu pengetahuan";
+            document.getElementById('auth-btn-text').textContent = isLogin ? "Masuk" : "Daftar Akun Baru";
+            document.getElementById('auth-switch-text').textContent = isLogin ? "Belum memiliki akun?" : "Sudah memiliki akun?";
+            document.getElementById('auth-switch-btn').textContent = isLogin ? "Daftar sekarang" : "Masuk di sini";
+            
+            // Reset password visibility mode to hidden on transition
+            const passwordInput = document.getElementById('auth-password');
+            const toggleIcon = document.getElementById('password-toggle-icon');
+            if (passwordInput) passwordInput.type = 'password';
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        function toggleAuthMode() {
+            setAuthMode(!isLoginMode);
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                showToast("Error: Hubungkan URL Google Apps Script Anda terlebih dahulu di baris atas script!", "error");
+                return;
+            }
+
+            const usernameInput = document.getElementById('auth-username').value.trim();
+            const passwordInput = document.getElementById('auth-password').value;
+            const action = isLoginMode ? "login" : "register";
+
+            const res = await fetchGAS({
+                action: action,
+                payload: { username: usernameInput, password: passwordInput }
+            });
+
+            if (res.success) {
+                currentUser = res.data; 
+                showToast(`Autentikasi Berhasil! Selamat datang ${currentUser.username}`, "success");
+                updateNavbar();
+                navigate(currentUser.role === 'admin' ? 'admin' : 'user');
+                document.getElementById('auth-form').reset();
+            } else {
+                showToast(res.message || "Identifikasi gagal. Periksa username & password kembali.", "error");
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            cart = [];
+            updateCartBadge();
+            updateNavbar();
+            navigate('landing');
+            showToast("Anda telah keluar dari sesi.", "info");
+        }
+
+        // ==========================================
+        // 6. EBOOK IMAGE SELECTION & LIVE PREVIEW
+        // ==========================================
+        function handleImageSelection(type) {
+            const fileInput = document.getElementById('new-image-file');
+            const urlInput = document.getElementById('new-image-url');
+            const previewImg = document.getElementById('admin-product-preview');
+            const previewIcon = document.getElementById('admin-preview-icon');
+
+            if (type === 'file' && fileInput && fileInput.files.length > 0) {
+                selectedImageType = 'file';
+                if (urlInput) {
+                    urlInput.value = ""; 
+                    urlInput.placeholder = "Menggunakan file dari komputer (Terpilih)";
+                }
+                
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    base64ImageData = reader.result; 
+                    if (previewImg) {
+                        previewImg.src = base64ImageData;
+                        previewImg.classList.remove('hidden');
+                    }
+                    if (previewIcon) previewIcon.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+
+            } else if (type === 'url' && urlInput && urlInput.value.trim() !== "") {
+                selectedImageType = 'url';
+                if (fileInput) fileInput.value = ""; 
+                base64ImageData = ""; 
+                
+                if (previewImg) {
+                    previewImg.src = urlInput.value.trim();
+                    previewImg.classList.remove('hidden');
+                }
+                if (previewIcon) previewIcon.classList.add('hidden');
+            } else {
+                // Reset states
+                selectedImageType = null;
+                base64ImageData = "";
+                if (urlInput) urlInput.placeholder = "Atau tempel URL Gambar di sini";
+                if (previewImg) {
+                    previewImg.src = "";
+                    previewImg.classList.add('hidden');
+                }
+                if (previewIcon) previewIcon.classList.remove('hidden');
+            }
+        }
+
+        // ==========================================
+        // 7. EBOOK CATALOG POSTING ENGINE (ADMIN)
+        // ==========================================
+        async function handleAddProduct(e) {
+            e.preventDefault();
+            
+            let finalImageUrl = "";
+
+            if (selectedImageType === 'file' && base64ImageData !== "") {
+                finalImageUrl = base64ImageData;
+            } else if (selectedImageType === 'url') {
+                const urlValue = document.getElementById('new-image-url').value.trim();
+                if (urlValue !== "") finalImageUrl = urlValue;
+            }
+
+            if (!finalImageUrl) {
+                showToast("Silakan pilih file komputer atau lampirkan tautan URL gambar terlebih dahulu!", "error");
+                return;
+            }
+
+            const title = document.getElementById('new-title').value.trim();
+            const price = parseInt(document.getElementById('new-price').value);
+            const payload = { title, price, image: finalImageUrl };
+
+            // Jalankan bypass simulasi jika URL kosong
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                const newId = String(MOCK_PRODUCTS.length + 1);
+                MOCK_PRODUCTS.unshift({ id: newId, ...payload });
+                showToast("Mode Demo: Ebook berhasil diposting ke catalog!", "success");
+                
+                // Reset UI & States
+                document.getElementById('add-product-form').reset();
+                selectedImageType = null;
+                base64ImageData = "";
+                document.getElementById('admin-product-preview').classList.add('hidden');
+                document.getElementById('admin-preview-icon').classList.remove('hidden');
+                document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
+                
+                loadProducts();
+                return;
+            }
+
+            const res = await fetchGAS({ action: "addProduct", payload: payload });
+            if (res && res.success) {
+                showToast("Sistem Berhasil mempublikasikan Ebook Baru!", "success");
+                
+                // Reset UI & States
+                document.getElementById('add-product-form').reset();
+                selectedImageType = null;
+                base64ImageData = "";
+                document.getElementById('admin-product-preview').classList.add('hidden');
+                document.getElementById('admin-preview-icon').classList.remove('hidden');
+                document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
+                
+                loadProducts(); 
+            } else {
+                showToast("Post gagal dilakukan.", "error");
+            }
+        }
+
+        async function loadProducts() {
+            let fetchedProducts = [];
+            
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                fetchedProducts = MOCK_PRODUCTS;
+            } else {
+                const res = await fetchGAS({ action: "getProducts", payload: {} });
+                if (res && res.success) {
+                    fetchedProducts = res.data;
+                } else {
+                    fetchedProducts = MOCK_PRODUCTS; 
+                    showToast("Gagal memuat produk dari server. Menggunakan database cadangan.", "info");
+                }
+            }
+
+            products = fetchedProducts;
+            renderProducts();
+            if (currentUser && currentUser.role === 'admin') {
+                renderAdminProducts();
+                document.getElementById('stat-total-books').textContent = products.length;
+            }
+        }
+
+        function renderProducts() {
+            const createCard = (p) => `
+                <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 border border-slate-200/50 flex flex-col h-full">
+                    <div class="h-64 overflow-hidden relative bg-slate-100 flex items-center justify-center">
+                        <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/300x400/9333ea/ffffff?text=E-Book+Cover'">
+                        <span class="absolute top-3 right-3 bg-purple-600 text-white font-bold text-xs py-1 px-2.5 rounded-full shadow-md"><i class="fas fa-tag mr-1"></i>Ebook</span>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-extrabold text-base text-slate-800 line-clamp-2 leading-snug hover:text-purple-700 cursor-pointer" title="${p.title}">${p.title}</h4>
+                            <p class="text-purple-600 font-extrabold text-base mt-2.5">Rp ${parseInt(p.price).toLocaleString('id-ID')}</p>
+                        </div>
+                        <button onclick="addToCart('${p.id}')" class="w-full mt-4 bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-bold py-2.5 rounded-xl transition duration-300 flex items-center justify-center gap-1.5 text-xs tracking-wider uppercase">
+                            <i class="fas fa-shopping-basket"></i> Masukkan Keranjang
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const html = products.map(createCard).join('');
+            document.getElementById('landing-products').innerHTML = html || `<p class="col-span-full text-center text-slate-400 py-8">Belum ada ebook tersedia</p>`;
+            document.getElementById('user-products').innerHTML = html || `<p class="col-span-full text-center text-slate-400 py-8">Belum ada ebook tersedia</p>`;
+        }
+
+        function searchProducts(keyword) {
+            const term = keyword.toLowerCase();
+            const filtered = products.filter(p => p.title.toLowerCase().includes(term));
+            
+            const createCard = (p) => `
+                <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 border border-slate-200/50 flex flex-col h-full">
+                    <div class="h-64 overflow-hidden relative bg-slate-100 flex items-center justify-center">
+                        <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/300x400/9333ea/ffffff?text=E-Book+Cover'">
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-extrabold text-base text-slate-800 line-clamp-2">${p.title}</h4>
+                            <p class="text-purple-600 font-extrabold text-base mt-2">Rp ${parseInt(p.price).toLocaleString('id-ID')}</p>
+                        </div>
+                        <button onclick="addToCart('${p.id}')" class="w-full mt-4 bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-bold py-2.5 rounded-xl transition duration-300 flex items-center justify-center gap-1.5 text-xs">
+                            <i class="fas fa-shopping-basket"></i> Masukkan Keranjang
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('landing-products').innerHTML = filtered.map(createCard).join('') || `<p class="col-span-full text-center text-slate-400 py-8">Hasil tidak ditemukan</p>`;
+        }
+
+        async function deleteProduct(id) {
+            const confirmation = confirm("Apakah Anda yakin ingin menghapus Ebook ini dari katalog?");
+            if (!confirmation) return;
+
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                const idx = MOCK_PRODUCTS.findIndex(p => p.id === id);
+                if (idx !== -1) {
+                    MOCK_PRODUCTS.splice(idx, 1);
+                    showToast("Mode Demo: Ebook dihapus dari sistem.", "info");
+                    loadProducts();
+                }
+                return;
+            }
+
+            const res = await fetchGAS({ action: "deleteProduct", payload: { id: id } });
+            if (res && res.success) {
+                showToast("Ebook berhasil ditarik dari peredaran.", "success");
+                loadProducts();
+            } else {
+                showToast("Penghapusan gagal dilakukan.", "error");
+            }
+        }
+
+        function renderAdminProducts() {
+            const tbody = document.getElementById('admin-products-table');
+            if (!tbody) return;
+            tbody.innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-50/50">
+                    <td class="p-3"><img src="${p.image}" class="w-12 h-16 object-cover rounded shadow border" onerror="this.src='https://placehold.co/100x150/9333ea/ffffff?text=Ebook'"></td>
+                    <td class="p-3 font-semibold text-slate-800">${p.title}</td>
+                    <td class="p-3 text-purple-600 font-bold">Rp ${parseInt(p.price).toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteProduct('${p.id}')" class="w-9 h-9 inline-flex items-center justify-center rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 hover:text-rose-600 transition" title="Hapus Ebook">
+                            <i class="fas fa-trash-alt text-sm"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ==========================================
+        // 8. USER MANAGEMENT OVERSEER (ADMIN)
+        // ==========================================
+        async function loadUsers() {
+            const refreshIcon = document.getElementById('user-refresh-icon');
+            const syncLoader = document.getElementById('user-sync-loader');
+            
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+            if (syncLoader) syncLoader.classList.remove('hidden');
+
+            let userList = [];
+
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                userList = MOCK_USERS;
+            } else {
+                const res = await fetchGAS({ action: "getUsers", payload: {} });
+                if (res && res.success) {
+                    userList = res.data;
+                } else {
+                    userList = MOCK_USERS;
+                    console.warn("Spreadsheet users request returned false. Using fallback.");
+                }
+            }
+
+            users = userList;
+            renderUsers();
+            document.getElementById('stat-total-users').textContent = users.length;
+
+            setTimeout(() => {
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+                if (syncLoader) syncLoader.classList.add('hidden');
+            }, 600);
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('admin-users-table');
+            if (!tbody) return;
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada user terdaftar.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = users.map((u, i) => {
+                const isUserAdmin = u.role === 'admin';
+                const roleBadge = isUserAdmin 
+                    ? `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"><i class="fas fa-user-shield mr-1"></i> Admin</span>` 
+                    : `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-medium bg-slate-100 text-slate-700"><i class="fas fa-user-tag mr-1"></i> Pengguna</span>`;
+                
+                return `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="p-3 font-semibold text-slate-500">${i + 1}</td>
+                        <td class="p-3 font-bold text-slate-800">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 mr-2.5 flex items-center justify-center text-slate-500 font-bold uppercase text-xs">
+                                    ${u.username.charAt(0)}
+                                </div>
+                                <span>${u.username}</span>
+                            </div>
+                        </td>
+                        <td class="p-3">${roleBadge}</td>
+                        <td class="p-3 text-center font-medium text-slate-500">${u.date || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 9. CART & ORDERING TRANSACTIONS
+        // ==========================================
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                renderCart();
+            }
+        }
+
+        function addToCart(productId) {
+            if (!currentUser) {
+                showToast("Anda harus masuk atau mendaftar terlebih dahulu untuk memesan.", "error");
+                setTimeout(() => navigate('auth'), 1200);
+                return;
+            }
+            if (currentUser.role === 'admin') {
+                showToast("Admin tidak diperkenankan memesan produk.", "error");
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartBadge();
+            renderCart();
+            showToast(`Berhasil memasukkan "${product.title}" ke keranjang!`, "success");
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fas fa-shopping-basket text-5xl mb-3 text-slate-300"></i>
+                        <p class="text-sm font-semibold">Keranjang masih kosong</p>
+                        <p class="text-xs text-slate-400 mt-1">Ebook yang Anda pilih akan tampil di sini</p>
+                    </div>
+                `;
+                totalEl.textContent = "Rp 0";
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm gap-2">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <img src="${item.image}" class="w-10 h-14 object-cover rounded-md border shrink-0" onerror="this.src='https://placehold.co/100x150/9333ea/ffffff?text=Cover'">
+                            <div class="min-w-0">
+                                <h4 class="font-extrabold text-xs text-slate-800 truncate" title="${item.title}">${item.title}</h4>
+                                <p class="text-[10px] text-slate-500 mt-0.5">${item.qty} pcs x Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <span class="font-bold text-purple-700 text-xs">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                            <button onclick="removeFromCart(${index})" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-rose-50 text-rose-400 hover:text-rose-500 transition">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            totalEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartBadge();
+            renderCart();
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                showToast("Keranjang kosong!", "error");
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
+            // PERBAIKAN UTAMA: Mengonversi data keranjang belanja menjadi format teks biasa ("sehati (x1)")
+            // agar tersimpan secara rapi, bersih, dan sangat mudah dibaca langsung di spreadsheet order Anda.
+            const formattedItemsText = cart.map(item => `${item.title} (x${item.qty})`).join(', ');
+
+            const payload = {
+                username: currentUser.username,
+                items: formattedItemsText, // Kirim teks biasa, bukan string JSON mentah
+                total: total
+            };
+
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+                const mockDate = new Date().toISOString().slice(0, 10);
+                MOCK_ORDERS.unshift({ orderId, username: currentUser.username, items: payload.items, total, date: mockDate });
+                
+                showToast("Simulasi Pembayaran Berhasil! Buku digital diproses.", "success");
+                cart = [];
+                updateCartBadge();
+                toggleCart();
+                loadOrders();
+                return;
+            }
+
+            const res = await fetchGAS({ action: "addOrder", payload: payload });
+            if (res && res.success) {
+                showToast("Transaksi Berhasil Diproses! Terima kasih.", "success");
+                cart = [];
+                updateCartBadge();
+                toggleCart();
+                // Refresh order admin if currently logged in as admin
+                if (currentUser && currentUser.role === 'admin') {
+                    loadOrders();
+                }
+            } else {
+                showToast("Gagal melakukan checkout.", "error");
+            }
+        }
+
+        // ==========================================
+        // 10. ORDER ARCHIVE CONTROLLER (ADMIN)
+        // ==========================================
+        async function loadOrders() {
+            let orderList = [];
+
+            if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
+                orderList = MOCK_ORDERS;
+            } else {
+                const res = await fetchGAS({ action: "getOrders", payload: {} });
+                if (res && res.success) {
+                    orderList = res.data;
+                } else {
+                    orderList = MOCK_ORDERS;
+                }
+            }
+
+            orders = orderList;
+            renderOrders();
+
+            document.getElementById('stat-total-orders').textContent = orders.length;
+            const revenue = orders.reduce((sum, o) => sum + parseInt(o.total || 0), 0);
+            document.getElementById('stat-total-revenue').textContent = `Rp ${revenue.toLocaleString('id-ID')}`;
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('admin-orders-table');
+            if (!tbody) return;
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada transaksi terekam.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => {
+                let itemsHtml = "";
+                try {
+                    let rawItems = o.items;
+                    
+                    // Cek jika item berupa JSON string (misal data lama)
+                    if (typeof rawItems === 'string' && (rawItems.startsWith('[') || rawItems.startsWith('{'))) {
+                        let parsed = JSON.parse(rawItems);
+                        if (typeof parsed === 'string') {
+                            parsed = JSON.parse(parsed); // Double parsing guard
+                        }
+                        
+                        if (Array.isArray(parsed)) {
+                            itemsHtml = parsed.map(i => `${i.title} <span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x${i.qty})</span>`).join(', ');
+                        } else if (typeof parsed === 'object' && parsed !== null) {
+                            itemsHtml = `${parsed.title || 'Ebook'} <span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x${parsed.qty || 1})</span>`;
+                        } else {
+                            itemsHtml = String(rawItems);
+                        }
+                    } else {
+                        // Jika sudah berformat teks bersih ("sehati (x1)"), bungkus angka (x1) dengan tag badge HTML yang rapi secara otomatis
+                        itemsHtml = String(rawItems).replace(/\(x(\d+)\)/g, '<span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x$1)</span>');
+                    }
+                } catch (e) {
+                    // Fallback pembersihan teks biasa jika parsing gagal
+                    itemsHtml = String(o.items)
+                        .replace(/[\[\]\{\}\"\\]/g, '')
+                        .replace(/title:/g, '')
+                        .replace(/qty:/g, ' x')
+                        .replace(/:/g, '')
+                        .replace(/,/g, ', ');
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="p-3 text-xs text-slate-500 font-bold">${o.orderId}</td>
+                        <td class="p-3 font-semibold text-slate-800">${o.username}</td>
+                        <td class="p-3 text-xs text-slate-600 font-medium max-w-xs" title="${itemsHtml.replace(/<[^>]*>/g, '')}">${itemsHtml}</td>
+                        <td class="p-3 font-bold text-emerald-600">Rp ${parseInt(o.total).toLocaleString('id-ID')}</td>
+                        <td class="p-3 text-xs text-slate-500 font-medium">${o.date || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function scrollToProducts() {
+            document.getElementById('product-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = () => {
+            navigate('landing');
+        };
+    </script>
+</body>
+</html>
