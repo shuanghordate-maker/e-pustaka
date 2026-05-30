@@ -503,7 +503,7 @@
         // ==========================================
         // 1. CONFIGURATION (Google Apps Script)
         // ==========================================
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIyNHOB3DZfPJhhOJxuHTzSRf-FuKL_H_bFHanWY52mtoRMRDOdmZHQ9zhFG4utBH6/exec"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9BqdqOYrX4aozPcj3RKOB7WoYw77unTwn2bgrNUc6Qzv2JRdqKiacjOvNlmdoahzy/exec"; 
         
         // ==========================================
         // 2. APP STATE (In-Memory Data)
@@ -588,13 +588,20 @@
                     method: 'POST',
                     body: JSON.stringify(payloadData)
                 });
-                const result = await response.json();
+                const text = await response.text();
                 setLoading(false);
-                return result;
+                if (!response.ok) {
+                    return { success: false, message: `Permintaan server gagal (${response.status})`, error: text };
+                }
+                try {
+                    return JSON.parse(text);
+                } catch (parseError) {
+                    return { success: false, message: "Respons tidak dapat diurai dari Apps Script.", error: text };
+                }
             } catch (error) {
                 setLoading(false);
                 console.error("CORS / GAS Fetch Error:", error);
-                return { success: false, error: error };
+                return { success: false, message: error.message || "Fetch error ke Apps Script.", error: String(error) };
             }
         }
 
@@ -734,7 +741,9 @@
                 navigate(currentUser.role === 'admin' ? 'admin' : 'user');
                 document.getElementById('auth-form').reset();
             } else {
-                showToast(res.message || "Identifikasi gagal. Periksa username & password kembali.", "error");
+                const errorMsg = res.message || res.error || "Identifikasi gagal. Periksa username & password kembali.";
+                console.warn("Login gagal:", res);
+                showToast(errorMsg, "error");
             }
         }
 
