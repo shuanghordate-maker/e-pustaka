@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+   
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -94,7 +94,7 @@
                         </svg>
                         <span class="text-xs font-semibold text-purple-700">Memuat data...</span>
                     </div>
-                    
+                   
                     <!-- Guest Navigation (Not logged in) -->
                     <div id="nav-guest" class="flex items-center space-x-2">
                         <button onclick="navigate('auth'); setAuthMode(true)" class="text-slate-600 hover:text-purple-600 font-semibold px-4 py-2 rounded-xl transition text-sm">Masuk</button>
@@ -107,7 +107,7 @@
                             <span id="user-greeting" class="font-bold text-slate-800 text-sm"></span>
                             <span id="user-role-badge" class="text-[10px] font-semibold text-purple-600 uppercase tracking-widest"></span>
                         </div>
-                        
+                       
                         <!-- Back to Admin Dashboard Shortcut -->
                         <button id="btn-admin-dashboard" onclick="navigate('admin')" class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-2 rounded-xl text-xs transition items-center space-x-1">
                             <i class="fas fa-user-shield"></i>
@@ -197,7 +197,7 @@
                         <h2 class="text-2xl font-extrabold text-slate-900" id="auth-title">Masuk ke Akun Anda</h2>
                         <p class="text-slate-500 text-sm mt-1" id="auth-subtitle">Kelola pustaka digital pribadi Anda</p>
                     </div>
-                    
+                   
                     <form id="auth-form" onsubmit="handleAuth(event)">
                         <div class="mb-4">
                             <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Username</label>
@@ -207,7 +207,7 @@
                                 </span>
                                 <input type="text" id="auth-username" placeholder="Masukkan username" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60">
                             </div>
-                            <p class="text-xs text-indigo-600 mt-1.5 font-medium"><i class="fas fa-info-circle mr-1"></i> Gunakan "admin" untuk masuk sebagai Admin.</p>
+                            <p class="text-xs text-indigo-600 mt-1.5 font-medium"><i class="fas fa-info-circle mr-1"></i>
                         </div>
                         <div class="mb-6">
                             <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
@@ -260,7 +260,7 @@
         <!-- VIEW 4: ADMIN DASHBOARD -->
         <div id="view-admin" class="page-view">
             <div class="flex flex-col lg:flex-row gap-8 items-start">
-                
+               
                 <!-- Admin Left Sidebar Navigation -->
                 <div class="w-full lg:w-64 glass-card rounded-2xl p-4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible shrink-0">
                     <div class="hidden lg:block p-3 border-b mb-3">
@@ -348,7 +348,7 @@
                         <!-- Post Ebook Form Card -->
                         <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
                             <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fas fa-plus-circle text-purple-600 mr-1.5"></i> Posting Ebook Baru</h3>
-                            
+                           
                             <!-- Form Tambah Produk (Terbaru dengan Fitur Upload File) -->
                             <form id="add-product-form" onsubmit="handleAddProduct(event)" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4 mb-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
                                 <div class="flex-1">
@@ -415,7 +415,7 @@
                                     <span>Segarkan Data</span>
                                 </button>
                             </div>
-                            
+                           
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
@@ -474,7 +474,7 @@
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-            
+           
             <div id="cart-items" class="p-5 flex-grow overflow-y-auto space-y-4">
                 <!-- Shopping items inside cart rendered via JS -->
             </div>
@@ -503,17 +503,17 @@
         // ==========================================
         // 1. CONFIGURATION (Google Apps Script)
         // ==========================================
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjIQ8RvWeCi_u2A3QxkeagtjXnWo6fuPUBSzJhhBCQskuFxBaes8qNIwIhkzGYRWxI/exec"; 
-        
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjIQ8RvWeCi_u2A3QxkeagtjXnWo6fuPUBSzJhhBCQskuFxBaes8qNIwIhkzGYRWxI/exec";
+       
         // ==========================================
         // 2. APP STATE (In-Memory Data)
         // ==========================================
         let isLoginMode = true;
-        let currentUser = null; 
+        let currentUser = null;
         let cart = [];
         let products = [];
         let orders = [];
-        let users = []; 
+        let users = [];
         let isLoading = false;
 
         // Image handler states (Global variables)
@@ -546,7 +546,7 @@
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            
+           
             if (type === 'success') {
                 toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-emerald-500 to-teal-600";
             } else if (type === 'error') {
@@ -554,10 +554,10 @@
             } else {
                 toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-purple-500 to-indigo-600";
             }
-            
+           
             toast.classList.remove('invisible', 'translate-y-4');
             toast.classList.add('visible', 'translate-y-0');
-            
+           
             setTimeout(() => {
                 toast.classList.add('invisible', 'translate-y-4');
                 toast.classList.remove('visible', 'translate-y-0');
@@ -612,7 +612,7 @@
             document.querySelectorAll('.page-view').forEach(el => {
                 el.classList.remove('active');
             });
-            
+           
             const target = document.getElementById(`view-${viewId}`);
             if (target) {
                 target.classList.add('active');
@@ -702,7 +702,7 @@
             document.getElementById('auth-btn-text').textContent = isLogin ? "Masuk" : "Daftar Akun Baru";
             document.getElementById('auth-switch-text').textContent = isLogin ? "Belum memiliki akun?" : "Sudah memiliki akun?";
             document.getElementById('auth-switch-btn').textContent = isLogin ? "Daftar sekarang" : "Masuk di sini";
-            
+           
             // Reset password visibility mode to hidden on transition
             const passwordInput = document.getElementById('auth-password');
             const toggleIcon = document.getElementById('password-toggle-icon');
@@ -719,7 +719,7 @@
 
         async function handleAuth(e) {
             e.preventDefault();
-            
+           
             if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
                 showToast("Error: Hubungkan URL Google Apps Script Anda terlebih dahulu di baris atas script!", "error");
                 return;
@@ -735,7 +735,7 @@
             });
 
             if (res.success) {
-                currentUser = res.data; 
+                currentUser = res.data;
                 showToast(`Autentikasi Berhasil! Selamat datang ${currentUser.username}`, "success");
                 updateNavbar();
                 navigate(currentUser.role === 'admin' ? 'admin' : 'user');
@@ -768,14 +768,14 @@
             if (type === 'file' && fileInput && fileInput.files.length > 0) {
                 selectedImageType = 'file';
                 if (urlInput) {
-                    urlInput.value = ""; 
+                    urlInput.value = "";
                     urlInput.placeholder = "Menggunakan file dari komputer (Terpilih)";
                 }
-                
+               
                 const file = fileInput.files[0];
                 const reader = new FileReader();
                 reader.onloadend = function() {
-                    base64ImageData = reader.result; 
+                    base64ImageData = reader.result;
                     if (previewImg) {
                         previewImg.src = base64ImageData;
                         previewImg.classList.remove('hidden');
@@ -786,9 +786,9 @@
 
             } else if (type === 'url' && urlInput && urlInput.value.trim() !== "") {
                 selectedImageType = 'url';
-                if (fileInput) fileInput.value = ""; 
-                base64ImageData = ""; 
-                
+                if (fileInput) fileInput.value = "";
+                base64ImageData = "";
+               
                 if (previewImg) {
                     previewImg.src = urlInput.value.trim();
                     previewImg.classList.remove('hidden');
@@ -812,7 +812,7 @@
         // ==========================================
         async function handleAddProduct(e) {
             e.preventDefault();
-            
+           
             let finalImageUrl = "";
 
             if (selectedImageType === 'file' && base64ImageData !== "") {
@@ -836,7 +836,7 @@
                 const newId = String(MOCK_PRODUCTS.length + 1);
                 MOCK_PRODUCTS.unshift({ id: newId, ...payload });
                 showToast("Mode Demo: Ebook berhasil diposting ke catalog!", "success");
-                
+               
                 // Reset UI & States
                 document.getElementById('add-product-form').reset();
                 selectedImageType = null;
@@ -844,7 +844,7 @@
                 document.getElementById('admin-product-preview').classList.add('hidden');
                 document.getElementById('admin-preview-icon').classList.remove('hidden');
                 document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
-                
+               
                 loadProducts();
                 return;
             }
@@ -852,7 +852,7 @@
             const res = await fetchGAS({ action: "addProduct", payload: payload });
             if (res && res.success) {
                 showToast("Sistem Berhasil mempublikasikan Ebook Baru!", "success");
-                
+               
                 // Reset UI & States
                 document.getElementById('add-product-form').reset();
                 selectedImageType = null;
@@ -860,8 +860,8 @@
                 document.getElementById('admin-product-preview').classList.add('hidden');
                 document.getElementById('admin-preview-icon').classList.remove('hidden');
                 document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
-                
-                loadProducts(); 
+               
+                loadProducts();
             } else {
                 showToast("Post gagal dilakukan.", "error");
             }
@@ -869,7 +869,7 @@
 
         async function loadProducts() {
             let fetchedProducts = [];
-            
+           
             if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
                 fetchedProducts = MOCK_PRODUCTS;
             } else {
@@ -877,7 +877,7 @@
                 if (res && res.success) {
                     fetchedProducts = res.data;
                 } else {
-                    fetchedProducts = MOCK_PRODUCTS; 
+                    fetchedProducts = MOCK_PRODUCTS;
                     showToast("Gagal memuat produk dari server. Menggunakan database cadangan.", "info");
                 }
             }
@@ -917,7 +917,7 @@
         function searchProducts(keyword) {
             const term = keyword.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(term));
-            
+           
             const createCard = (p) => `
                 <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 border border-slate-200/50 flex flex-col h-full">
                     <div class="h-64 overflow-hidden relative bg-slate-100 flex items-center justify-center">
@@ -983,7 +983,7 @@
         async function loadUsers() {
             const refreshIcon = document.getElementById('user-refresh-icon');
             const syncLoader = document.getElementById('user-sync-loader');
-            
+           
             if (refreshIcon) refreshIcon.classList.add('animate-spin');
             if (syncLoader) syncLoader.classList.remove('hidden');
 
@@ -1021,10 +1021,10 @@
 
             tbody.innerHTML = users.map((u, i) => {
                 const isUserAdmin = u.role === 'admin';
-                const roleBadge = isUserAdmin 
-                    ? `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"><i class="fas fa-user-shield mr-1"></i> Admin</span>` 
+                const roleBadge = isUserAdmin
+                    ? `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"><i class="fas fa-user-shield mr-1"></i> Admin</span>`
                     : `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-medium bg-slate-100 text-slate-700"><i class="fas fa-user-tag mr-1"></i> Pengguna</span>`;
-                
+               
                 return `
                     <tr class="hover:bg-slate-50/50">
                         <td class="p-3 font-semibold text-slate-500">${i + 1}</td>
@@ -1083,7 +1083,7 @@
         function updateCartBadge() {
             const badge = document.getElementById('cart-badge');
             const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            
+           
             if (totalItems > 0) {
                 badge.textContent = totalItems;
                 badge.classList.remove('hidden');
@@ -1095,7 +1095,7 @@
         function renderCart() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
-            
+           
             if (cart.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-12 text-slate-400">
@@ -1130,7 +1130,7 @@
                     </div>
                 `;
             }).join('');
-            
+           
             totalEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
         }
 
@@ -1147,7 +1147,7 @@
             }
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
+           
             // PERBAIKAN UTAMA: Mengonversi data keranjang belanja menjadi format teks biasa ("sehati (x1)")
             // agar tersimpan secara rapi, bersih, dan sangat mudah dibaca langsung di spreadsheet order Anda.
             const formattedItemsText = cart.map(item => `${item.title} (x${item.qty})`).join(', ');
@@ -1162,7 +1162,7 @@
                 const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
                 const mockDate = new Date().toISOString().slice(0, 10);
                 MOCK_ORDERS.unshift({ orderId, username: currentUser.username, items: payload.items, total, date: mockDate });
-                
+               
                 showToast("Simulasi Pembayaran Berhasil! Buku digital diproses.", "success");
                 cart = [];
                 updateCartBadge();
@@ -1223,14 +1223,14 @@
                 let itemsHtml = "";
                 try {
                     let rawItems = o.items;
-                    
+                   
                     // Cek jika item berupa JSON string (misal data lama)
                     if (typeof rawItems === 'string' && (rawItems.startsWith('[') || rawItems.startsWith('{'))) {
                         let parsed = JSON.parse(rawItems);
                         if (typeof parsed === 'string') {
                             parsed = JSON.parse(parsed); // Double parsing guard
                         }
-                        
+                       
                         if (Array.isArray(parsed)) {
                             itemsHtml = parsed.map(i => `${i.title} <span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x${i.qty})</span>`).join(', ');
                         } else if (typeof parsed === 'object' && parsed !== null) {
