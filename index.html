@@ -235,7 +235,7 @@
             </div>
         </div>
 
-        <!-- VIEW 3: USER DASHBOARD (UPDATED!) -->
+        <!-- VIEW 3: USER DASHBOARD -->
         <div id="view-user" class="page-view">
             <!-- Navigation Sub-Menu Tabs -->
             <div class="flex border-b border-slate-200 mb-8 gap-2 overflow-x-auto pb-1">
@@ -272,7 +272,7 @@
                 </div>
             </div>
 
-            <!-- USER TAB 2: HISTORY (NEW!) -->
+            <!-- USER TAB 2: HISTORY -->
             <div id="user-tab-history" class="user-tab-content hidden space-y-6">
                 <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div class="flex items-center justify-between mb-4 pb-4 border-b">
@@ -303,7 +303,7 @@
                 </div>
             </div>
 
-            <!-- USER TAB 3: PROFILE (NEW!) -->
+            <!-- USER TAB 3: PROFILE -->
             <div id="user-tab-profile" class="user-tab-content hidden space-y-6">
                 <div class="max-w-2xl mx-auto glass-card rounded-3xl overflow-hidden border border-slate-100 shadow-xl">
                     <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 text-white relative">
@@ -578,7 +578,7 @@
         </div>
     </div>
 
-    <!-- MODAL INSTRUKSI PEMBAYARAN REKENING (NEW!) -->
+    <!-- MODAL INSTRUKSI PEMBAYARAN REKENING -->
     <div id="payment-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] justify-center items-center flex hidden">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden flex flex-col max-h-[90vh] border border-slate-100">
             <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -694,25 +694,10 @@
         let selectedImageType = null;
         let base64ImageData = "";
 
-        // Offline Mock Data (Fallback)
-        const MOCK_PRODUCTS = [
-            { id: "1", title: "Rahasia Sukses Coding dengan Javascript", price: 65000, image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=300&q=80" },
-            { id: "2", title: "Panduan Modern UI/UX Design & Figma", price: 89000, image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=300&q=80" },
-            { id: "3", title: "Membangun SaaS Berbasis Framework Web", price: 120000, image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=300&q=80" },
-            { id: "4", title: "Menjadi Konten Kreator Profesional", price: 45000, image: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&w=300&q=80" }
-        ];
-
-        const MOCK_USERS = [
-            { username: "admin", role: "admin", date: "2026-01-10" },
-            { username: "budi_sanjaya", role: "user", date: "2026-03-12" },
-            { username: "clara_putri", role: "user", date: "2026-04-01" },
-            { username: "deni_suherman", role: "user", date: "2026-05-20" }
-        ];
-
-        const MOCK_ORDERS = [
-            { orderId: "ORD-9921", username: "budi_sanjaya", items: "Rahasia Sukses Coding dengan Javascript (x1)", total: 65000, date: "2026-03-12 14:22" },
-            { orderId: "ORD-9934", username: "clara_putri", items: "Panduan Modern UI/UX Design & Figma (x1), Menjadi Konten Kreator Profesional (x1)", total: 134000, date: "2026-04-02 09:10" }
-        ];
+        // Bersihkan total seluruh data cadangan/simulasi lama agar tidak pernah tampil lagi
+        const MOCK_PRODUCTS = [];
+        const MOCK_USERS = [];
+        const MOCK_ORDERS = [];
 
         // ==========================================
         // 3. UTILITY FUNCTIONS
@@ -856,7 +841,7 @@
             activeBtn.classList.add('bg-purple-600', 'text-white');
         }
 
-        // User Navigation Tabs (NEW!)
+        // User Navigation Tabs
         function switchUserTab(tabId) {
             document.querySelectorAll('.user-tab-content').forEach(el => {
                 el.classList.add('hidden');
@@ -1340,17 +1325,17 @@
             renderCart();
         }
 
-        // Checkout: Open payment modal with bank info (UPDATED!)
+        // Checkout: Buka modal instruksi pembayaran rekening resmi
         function checkout() {
             if (cart.length === 0) {
                 showToast("Keranjang Anda masih kosong!", "error");
                 return;
             }
             
-            // Hide Cart Modal
+            // Sembunyikan Modal Keranjang
             toggleCart();
             
-            // Populate payment summary
+            // Buat ringkasan pesanan ke format tulisan manusia bersih
             const summaryContainer = document.getElementById('payment-items-summary');
             let total = 0;
             
@@ -1367,7 +1352,7 @@
             
             document.getElementById('payment-total-amount').textContent = `Rp ${total.toLocaleString('id-ID')}`;
             
-            // Open Payment Modal
+            // Buka Modal Instruksi Pembayaran
             togglePaymentModal(true);
         }
 
@@ -1382,9 +1367,11 @@
             }
         }
 
-        // Submit actual order data to backend (NEW!)
+        // Mengirimkan data pesanan asli yang telah diformat bersih ke Google Sheets
         async function submitOrder() {
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
+            // Format ringkas manual untuk nama buku di Google Sheets agar rapi (cth: "sehati (x1)")
             const formattedItemsText = cart.map(item => `${item.title} (x${item.qty})`).join(', ');
 
             const payload = {
@@ -1412,9 +1399,9 @@
                 cart = [];
                 updateCartBadge();
                 togglePaymentModal(false);
-                loadOrders(); // Refresh orders history
+                loadOrders(); // Refresh halaman transaksi pengguna
             } else {
-                showToast("Gagal mengajukan konfirmasi pesanan.", "error");
+                showToast("Gagal mengirimkan konfirmasi pesanan.", "error");
             }
         }
 
@@ -1437,7 +1424,7 @@
 
             orders = orderList;
             
-            // Render Admin panel history if is admin, otherwise render User history
+            // Render panel yang sesuai dengan Role Pengguna
             if (currentUser) {
                 if (currentUser.role === 'admin') {
                     renderOrders();
@@ -1450,12 +1437,12 @@
             }
         }
 
-        // Render User personal shopping history (NEW!)
+        // Render Riwayat Pembelian Pribadi Pengguna
         function renderUserOrders() {
             const tbody = document.getElementById('user-orders-table');
             if (!tbody) return;
             
-            // Filter only current user orders
+            // Filter hanya pesanan milik user aktif
             const myOrders = orders.filter(o => o.username === currentUser.username);
             
             if (myOrders.length === 0) {
@@ -1482,7 +1469,7 @@
             }).join('');
         }
 
-        // Populate User personal Profile Card details (NEW!)
+        // Tampilkan Detail Kartu Profil Pengguna
         function renderUserProfile() {
             if (!currentUser) return;
             
@@ -1491,11 +1478,10 @@
             document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'ADMINISTRATOR UTAMA' : 'PENGGUNA VIP PREMIUM';
             document.getElementById('profile-username-detail').textContent = `@${currentUser.username}`;
             
-            // Try to match registration date from user DB if matching
+            // Ambil info tanggal pendaftaran dari database users
             const matchedUser = users.find(u => u.username === currentUser.username);
-            document.getElementById('profile-date-joined').textContent = matchedUser && matchedUser.date ? matchedUser.date : "2026-06-01 (Hari ini)";
+            document.getElementById('profile-date-joined').textContent = matchedUser && matchedUser.date ? matchedUser.date : "Baru saja bergabung";
             
-            // Calculate total user orders count
             const myOrdersCount = orders.filter(o => o.username === currentUser.username).length;
             document.getElementById('profile-total-orders-count').textContent = `${myOrdersCount} Transaksi Pesanan`;
         }
