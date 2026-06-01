@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-   
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -94,7 +94,7 @@
                         </svg>
                         <span class="text-xs font-semibold text-purple-700">Memuat data...</span>
                     </div>
-                   
+                    
                     <!-- Guest Navigation (Not logged in) -->
                     <div id="nav-guest" class="flex items-center space-x-2">
                         <button onclick="navigate('auth'); setAuthMode(true)" class="text-slate-600 hover:text-purple-600 font-semibold px-4 py-2 rounded-xl transition text-sm">Masuk</button>
@@ -107,7 +107,7 @@
                             <span id="user-greeting" class="font-bold text-slate-800 text-sm"></span>
                             <span id="user-role-badge" class="text-[10px] font-semibold text-purple-600 uppercase tracking-widest"></span>
                         </div>
-                       
+                        
                         <!-- Back to Admin Dashboard Shortcut -->
                         <button id="btn-admin-dashboard" onclick="navigate('admin')" class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-2 rounded-xl text-xs transition items-center space-x-1">
                             <i class="fas fa-user-shield"></i>
@@ -197,16 +197,17 @@
                         <h2 class="text-2xl font-extrabold text-slate-900" id="auth-title">Masuk ke Akun Anda</h2>
                         <p class="text-slate-500 text-sm mt-1" id="auth-subtitle">Kelola pustaka digital pribadi Anda</p>
                     </div>
-                   
+                    
                     <form id="auth-form" onsubmit="handleAuth(event)">
                         <div class="mb-4">
                             <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Username</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <i class="fas fa-user"></i>
                                 </span>
                                 <input type="text" id="auth-username" placeholder="Masukkan username" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60">
                             </div>
-                            <p class="text-xs text-indigo-600 mt-1.5 font-medium"><i class="fas fa-info-circle mr-1"></i>
+                            <p class="text-xs text-indigo-600 mt-1.5 font-medium"><i class="fas fa-info-circle mr-1"></i> Gunakan "admin" untuk masuk sebagai Admin.</p>
                         </div>
                         <div class="mb-6">
                             <label class="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Password</label>
@@ -234,32 +235,119 @@
             </div>
         </div>
 
-        <!-- VIEW 3: USER DASHBOARD -->
+        <!-- VIEW 3: USER DASHBOARD (UPDATED!) -->
         <div id="view-user" class="page-view">
-            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-3xl p-8 text-white mb-10 shadow-xl shadow-purple-100 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-                <div class="relative z-10 max-w-xl">
-                    <h2 class="text-3xl font-extrabold tracking-tight">Selamat Datang di Portal Buku!</h2>
-                    <p class="text-purple-200 mt-2 text-sm sm:text-base">Mulai tambahkan buku pilihan Anda ke keranjang belanja, dapatkan harga diskon spesial pengguna terdaftar!</p>
-                </div>
+            <!-- Navigation Sub-Menu Tabs -->
+            <div class="flex border-b border-slate-200 mb-8 gap-2 overflow-x-auto pb-1">
+                <button onclick="switchUserTab('catalog')" id="user-tab-btn-catalog" class="user-tab-btn flex items-center space-x-2 px-5 py-3 font-bold text-sm transition rounded-xl bg-purple-600 text-white shadow-sm shadow-purple-100">
+                    <i class="fas fa-book-open"></i>
+                    <span>Katalog Ebook</span>
+                </button>
+                <button onclick="switchUserTab('history')" id="user-tab-btn-history" class="user-tab-btn flex items-center space-x-2 px-5 py-3 font-semibold text-sm transition rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fas fa-receipt"></i>
+                    <span>Riwayat Belanja</span>
+                </button>
+                <button onclick="switchUserTab('profile')" id="user-tab-btn-profile" class="user-tab-btn flex items-center space-x-2 px-5 py-3 font-semibold text-sm transition rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profil Saya</span>
+                </button>
             </div>
 
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <!-- USER TAB 1: CATALOG -->
+            <div id="user-tab-catalog" class="user-tab-content block space-y-8">
+                <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-3xl p-8 text-white mb-10 shadow-xl shadow-purple-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+                    <div class="relative z-10 max-w-xl">
+                        <h2 class="text-3xl font-extrabold tracking-tight">Selamat Datang di Portal Buku!</h2>
+                        <p class="text-purple-200 mt-2 text-sm sm:text-base">Mulai tambahkan buku pilihan Anda ke keranjang belanja, dapatkan harga diskon spesial pengguna terdaftar!</p>
+                    </div>
+                </div>
+
                 <div>
                     <h3 class="text-2xl font-bold text-slate-800">Daftar Produk Ebook</h3>
-                    <p class="text-sm text-slate-500">Pilih ebook premium dan langsung bayar melalui keranjang</p>
+                    <p class="text-sm text-slate-500 mb-6">Pilih ebook premium dan langsung bayar melalui keranjang</p>
+                    <div id="user-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Products list in user dashboard -->
+                    </div>
                 </div>
             </div>
 
-            <div id="user-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Products list in user dashboard -->
+            <!-- USER TAB 2: HISTORY (NEW!) -->
+            <div id="user-tab-history" class="user-tab-content hidden space-y-6">
+                <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Daftar Riwayat Belanja</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Pantau status transaksi pembelian buku Anda di bawah ini</p>
+                        </div>
+                        <button onclick="loadOrders()" class="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition" title="Refresh Riwayat">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider">
+                                    <th class="p-4 border-b">ID Pesanan</th>
+                                    <th class="p-4 border-b">Buku Yang Dibeli</th>
+                                    <th class="p-4 border-b">Total Bayar</th>
+                                    <th class="p-4 border-b">Tanggal</th>
+                                    <th class="p-4 border-b text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-orders-table" class="text-sm divide-y">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USER TAB 3: PROFILE (NEW!) -->
+            <div id="user-tab-profile" class="user-tab-content hidden space-y-6">
+                <div class="max-w-2xl mx-auto glass-card rounded-3xl overflow-hidden border border-slate-100 shadow-xl">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 text-white relative">
+                        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <div class="w-24 h-24 rounded-full bg-white/20 border-4 border-white/40 flex items-center justify-center text-4xl font-extrabold shadow-inner select-none" id="profile-initial">
+                                U
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h3 id="profile-name" class="text-2xl font-extrabold tracking-tight">Nama Pengguna</h3>
+                                <p id="profile-role" class="text-purple-100 text-xs font-semibold tracking-widest uppercase mt-1">MEMBER PREMIUM</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 space-y-6 bg-white">
+                        <h4 class="font-bold text-slate-800 text-sm border-b pb-2"><i class="fas fa-id-card text-purple-600 mr-1.5"></i> Informasi Akun</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Username Resmi</p>
+                                <p id="profile-username-detail" class="text-base font-bold text-slate-800 mt-1">-</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Status Akses</p>
+                                <span class="inline-flex items-center px-3 py-1 mt-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Aktif & Terverifikasi
+                                </span>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Tanggal Terdaftar</p>
+                                <p id="profile-date-joined" class="text-base font-bold text-slate-800 mt-1">-</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide">Total Transaksi Belanja</p>
+                                <p id="profile-total-orders-count" class="text-base font-bold text-slate-800 mt-1">0 Pesanan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- VIEW 4: ADMIN DASHBOARD -->
         <div id="view-admin" class="page-view">
             <div class="flex flex-col lg:flex-row gap-8 items-start">
-               
+                
                 <!-- Admin Left Sidebar Navigation -->
                 <div class="w-full lg:w-64 glass-card rounded-2xl p-4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible shrink-0">
                     <div class="hidden lg:block p-3 border-b mb-3">
@@ -347,7 +435,7 @@
                         <!-- Post Ebook Form Card -->
                         <div class="glass-card p-6 rounded-2xl shadow-sm border border-white">
                             <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fas fa-plus-circle text-purple-600 mr-1.5"></i> Posting Ebook Baru</h3>
-                           
+                            
                             <!-- Form Tambah Produk (Terbaru dengan Fitur Upload File) -->
                             <form id="add-product-form" onsubmit="handleAddProduct(event)" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4 mb-6 bg-purple-50 p-5 rounded-xl border border-purple-100">
                                 <div class="flex-1">
@@ -414,7 +502,7 @@
                                     <span>Segarkan Data</span>
                                 </button>
                             </div>
-                           
+                            
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
@@ -473,7 +561,7 @@
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-           
+            
             <div id="cart-items" class="p-5 flex-grow overflow-y-auto space-y-4">
                 <!-- Shopping items inside cart rendered via JS -->
             </div>
@@ -484,8 +572,95 @@
                     <span id="cart-total" class="text-purple-600">Rp 0</span>
                 </div>
                 <button onclick="checkout()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition">
-                    <i class="fas fa-check-circle mr-1.5"></i> Selesaikan Pesanan (Checkout)
+                    <i class="fas fa-arrow-right mr-1.5"></i> Lanjutkan Pemesanan
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL INSTRUKSI PEMBAYARAN REKENING (NEW!) -->
+    <div id="payment-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] justify-center items-center flex hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden flex flex-col max-h-[90vh] border border-slate-100">
+            <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center">
+                    <i class="fas fa-wallet text-purple-600 mr-2"></i> Metode Pembayaran & Transfer
+                </h3>
+                <button onclick="togglePaymentModal(false)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-5">
+                <!-- Invoice Ringkasan Tagihan -->
+                <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                    <h4 class="font-bold text-xs text-purple-800 uppercase tracking-wider mb-2">Ringkasan Belanja</h4>
+                    <div id="payment-items-summary" class="text-xs text-slate-600 space-y-1">
+                        <!-- Terisi via JS -->
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-purple-200 flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-700">Total yang Harus Ditransfer:</span>
+                        <span id="payment-total-amount" class="text-base font-extrabold text-purple-700">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Rekening Admin Transfer -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm text-slate-800 flex items-center">
+                        <i class="fas fa-university text-purple-600 mr-2"></i> Rekening Resmi Admin E-Pustaka
+                    </h4>
+                    <p class="text-xs text-slate-500">Silakan lakukan transfer ke salah satu rekening admin di bawah:</p>
+                    
+                    <div class="space-y-2">
+                        <!-- Rekening Bank BCA -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-blue-600 text-white font-extrabold text-[10px] px-2 py-1 rounded tracking-wide uppercase">BCA</div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 select-all">812-7766-554</p>
+                                    <p class="text-[9px] text-slate-500">a/n Admin E-Pustaka Premium</p>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard('812-7766-554', 'BCA')" class="text-xs font-bold text-purple-600 hover:text-purple-800 bg-white border border-purple-100 px-3 py-1 rounded-lg shadow-sm transition">Salin</button>
+                        </div>
+
+                        <!-- Rekening Bank Mandiri -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-yellow-500 text-slate-900 font-extrabold text-[10px] px-2 py-1 rounded tracking-wide uppercase">Mandiri</div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 select-all">133-00-9988-7766</p>
+                                    <p class="text-[9px] text-slate-500">a/n Admin E-Pustaka Premium</p>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard('133-00-9988-7766', 'Mandiri')" class="text-xs font-bold text-purple-600 hover:text-purple-800 bg-white border border-purple-100 px-3 py-1 rounded-lg shadow-sm transition">Salin</button>
+                        </div>
+
+                        <!-- Rekening DANA -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-sky-500 text-white font-extrabold text-[10px] px-2 py-1 rounded tracking-wide uppercase">DANA</div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 select-all">0812-3456-7890</p>
+                                    <p class="text-[9px] text-slate-500">a/n Admin E-Pustaka Premium</p>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard('0812-3456-7890', 'DANA')" class="text-xs font-bold text-purple-600 hover:text-purple-800 bg-white border border-purple-100 px-3 py-1 rounded-lg shadow-sm transition">Salin</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Alert -->
+                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-amber-500 mt-0.5 shrink-0"></i>
+                    <p class="text-[10px] text-amber-800 leading-relaxed">
+                        <strong>Catatan Pembeli:</strong> Harap simpan bukti transfer Anda dengan baik. Admin akan melakukan pengecekan mutasi manual dan mengirimkan berkas ebook digital Anda melalui sistem panel.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-5 border-t bg-slate-50 flex space-x-3">
+                <button onclick="togglePaymentModal(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl text-xs transition uppercase tracking-wider">Batal</button>
+                <button onclick="submitOrder()" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-lg transition uppercase tracking-wider">Saya Sudah Transfer</button>
             </div>
         </div>
     </div>
@@ -502,17 +677,17 @@
         // ==========================================
         // 1. CONFIGURATION (Google Apps Script)
         // ==========================================
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjIQ8RvWeCi_u2A3QxkeagtjXnWo6fuPUBSzJhhBCQskuFxBaes8qNIwIhkzGYRWxI/exec";
-       
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUISakIz7buCazJIHR0dv9z2DCOgdUO_AV2IzU9VT3eRnMu2oedORiHom8Js1aQqEo/exec"; 
+        
         // ==========================================
         // 2. APP STATE (In-Memory Data)
         // ==========================================
         let isLoginMode = true;
-        let currentUser = null;
+        let currentUser = null; 
         let cart = [];
         let products = [];
         let orders = [];
-        let users = [];
+        let users = []; 
         let isLoading = false;
 
         // Image handler states (Global variables)
@@ -545,7 +720,7 @@
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-           
+            
             if (type === 'success') {
                 toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-emerald-500 to-teal-600";
             } else if (type === 'error') {
@@ -553,10 +728,10 @@
             } else {
                 toast.className = toast.className.replace(/bg-.*?(?=\s|$)/g, '') + " bg-gradient-to-r from-purple-500 to-indigo-600";
             }
-           
+            
             toast.classList.remove('invisible', 'translate-y-4');
             toast.classList.add('visible', 'translate-y-0');
-           
+            
             setTimeout(() => {
                 toast.classList.add('invisible', 'translate-y-4');
                 toast.classList.remove('visible', 'translate-y-0');
@@ -587,21 +762,22 @@
                     method: 'POST',
                     body: JSON.stringify(payloadData)
                 });
-                const text = await response.text();
+                const result = await response.json();
                 setLoading(false);
-                if (!response.ok) {
-                    return { success: false, message: `Permintaan server gagal (${response.status})`, error: text };
-                }
-                try {
-                    return JSON.parse(text);
-                } catch (parseError) {
-                    return { success: false, message: "Respons tidak dapat diurai dari Apps Script.", error: text };
-                }
+                return result;
             } catch (error) {
                 setLoading(false);
                 console.error("CORS / GAS Fetch Error:", error);
-                return { success: false, message: error.message || "Fetch error ke Apps Script.", error: String(error) };
+                return { success: false, error: error };
             }
+        }
+
+        function copyToClipboard(text, bankName) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Nomor rekening ${bankName} berhasil disalin!`, 'success');
+            }).catch(() => {
+                showToast('Gagal menyalin nomor rekening.', 'error');
+            });
         }
 
         // ==========================================
@@ -611,7 +787,7 @@
             document.querySelectorAll('.page-view').forEach(el => {
                 el.classList.remove('active');
             });
-           
+            
             const target = document.getElementById(`view-${viewId}`);
             if (target) {
                 target.classList.add('active');
@@ -628,6 +804,11 @@
 
             if (viewId === 'landing' || viewId === 'user') {
                 loadProducts();
+                if (currentUser) {
+                    loadOrders();
+                    renderUserProfile();
+                    switchUserTab('catalog'); // reset to catalog view
+                }
             }
             if (viewId === 'admin') {
                 loadProducts();
@@ -675,6 +856,28 @@
             activeBtn.classList.add('bg-purple-600', 'text-white');
         }
 
+        // User Navigation Tabs (NEW!)
+        function switchUserTab(tabId) {
+            document.querySelectorAll('.user-tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('.user-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-sm', 'shadow-purple-100');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            document.getElementById(`user-tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`user-tab-btn-${tabId}`);
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            activeBtn.classList.add('bg-purple-600', 'text-white', 'shadow-sm', 'shadow-purple-100');
+
+            if (tabId === 'history') {
+                loadOrders();
+            } else if (tabId === 'profile') {
+                renderUserProfile();
+            }
+        }
+
         // ==========================================
         // 5. SECURITY, AUTHENTICATION & PASSWORD EYE
         // ==========================================
@@ -701,8 +904,8 @@
             document.getElementById('auth-btn-text').textContent = isLogin ? "Masuk" : "Daftar Akun Baru";
             document.getElementById('auth-switch-text').textContent = isLogin ? "Belum memiliki akun?" : "Sudah memiliki akun?";
             document.getElementById('auth-switch-btn').textContent = isLogin ? "Daftar sekarang" : "Masuk di sini";
-           
-            // Reset password visibility mode to hidden on transition
+            
+            // Reset password visibility
             const passwordInput = document.getElementById('auth-password');
             const toggleIcon = document.getElementById('password-toggle-icon');
             if (passwordInput) passwordInput.type = 'password';
@@ -718,7 +921,7 @@
 
         async function handleAuth(e) {
             e.preventDefault();
-           
+            
             if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
                 showToast("Error: Hubungkan URL Google Apps Script Anda terlebih dahulu di baris atas script!", "error");
                 return;
@@ -734,15 +937,13 @@
             });
 
             if (res.success) {
-                currentUser = res.data;
+                currentUser = res.data; 
                 showToast(`Autentikasi Berhasil! Selamat datang ${currentUser.username}`, "success");
                 updateNavbar();
                 navigate(currentUser.role === 'admin' ? 'admin' : 'user');
                 document.getElementById('auth-form').reset();
             } else {
-                const errorMsg = res.message || res.error || "Identifikasi gagal. Periksa username & password kembali.";
-                console.warn("Login gagal:", res);
-                showToast(errorMsg, "error");
+                showToast(res.message || "Identifikasi gagal. Periksa username & password kembali.", "error");
             }
         }
 
@@ -767,14 +968,14 @@
             if (type === 'file' && fileInput && fileInput.files.length > 0) {
                 selectedImageType = 'file';
                 if (urlInput) {
-                    urlInput.value = "";
+                    urlInput.value = ""; 
                     urlInput.placeholder = "Menggunakan file dari komputer (Terpilih)";
                 }
-               
+                
                 const file = fileInput.files[0];
                 const reader = new FileReader();
                 reader.onloadend = function() {
-                    base64ImageData = reader.result;
+                    base64ImageData = reader.result; 
                     if (previewImg) {
                         previewImg.src = base64ImageData;
                         previewImg.classList.remove('hidden');
@@ -785,9 +986,9 @@
 
             } else if (type === 'url' && urlInput && urlInput.value.trim() !== "") {
                 selectedImageType = 'url';
-                if (fileInput) fileInput.value = "";
-                base64ImageData = "";
-               
+                if (fileInput) fileInput.value = ""; 
+                base64ImageData = ""; 
+                
                 if (previewImg) {
                     previewImg.src = urlInput.value.trim();
                     previewImg.classList.remove('hidden');
@@ -811,7 +1012,7 @@
         // ==========================================
         async function handleAddProduct(e) {
             e.preventDefault();
-           
+            
             let finalImageUrl = "";
 
             if (selectedImageType === 'file' && base64ImageData !== "") {
@@ -835,7 +1036,7 @@
                 const newId = String(MOCK_PRODUCTS.length + 1);
                 MOCK_PRODUCTS.unshift({ id: newId, ...payload });
                 showToast("Mode Demo: Ebook berhasil diposting ke catalog!", "success");
-               
+                
                 // Reset UI & States
                 document.getElementById('add-product-form').reset();
                 selectedImageType = null;
@@ -843,7 +1044,7 @@
                 document.getElementById('admin-product-preview').classList.add('hidden');
                 document.getElementById('admin-preview-icon').classList.remove('hidden');
                 document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
-               
+                
                 loadProducts();
                 return;
             }
@@ -851,7 +1052,7 @@
             const res = await fetchGAS({ action: "addProduct", payload: payload });
             if (res && res.success) {
                 showToast("Sistem Berhasil mempublikasikan Ebook Baru!", "success");
-               
+                
                 // Reset UI & States
                 document.getElementById('add-product-form').reset();
                 selectedImageType = null;
@@ -859,8 +1060,8 @@
                 document.getElementById('admin-product-preview').classList.add('hidden');
                 document.getElementById('admin-preview-icon').classList.remove('hidden');
                 document.getElementById('new-image-url').placeholder = "Atau tempel URL Gambar di sini";
-               
-                loadProducts();
+                
+                loadProducts(); 
             } else {
                 showToast("Post gagal dilakukan.", "error");
             }
@@ -868,7 +1069,7 @@
 
         async function loadProducts() {
             let fetchedProducts = [];
-           
+            
             if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
                 fetchedProducts = MOCK_PRODUCTS;
             } else {
@@ -876,7 +1077,7 @@
                 if (res && res.success) {
                     fetchedProducts = res.data;
                 } else {
-                    fetchedProducts = MOCK_PRODUCTS;
+                    fetchedProducts = MOCK_PRODUCTS; 
                     showToast("Gagal memuat produk dari server. Menggunakan database cadangan.", "info");
                 }
             }
@@ -916,7 +1117,7 @@
         function searchProducts(keyword) {
             const term = keyword.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(term));
-           
+            
             const createCard = (p) => `
                 <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 border border-slate-200/50 flex flex-col h-full">
                     <div class="h-64 overflow-hidden relative bg-slate-100 flex items-center justify-center">
@@ -982,7 +1183,7 @@
         async function loadUsers() {
             const refreshIcon = document.getElementById('user-refresh-icon');
             const syncLoader = document.getElementById('user-sync-loader');
-           
+            
             if (refreshIcon) refreshIcon.classList.add('animate-spin');
             if (syncLoader) syncLoader.classList.remove('hidden');
 
@@ -1020,10 +1221,10 @@
 
             tbody.innerHTML = users.map((u, i) => {
                 const isUserAdmin = u.role === 'admin';
-                const roleBadge = isUserAdmin
-                    ? `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"><i class="fas fa-user-shield mr-1"></i> Admin</span>`
+                const roleBadge = isUserAdmin 
+                    ? `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"><i class="fas fa-user-shield mr-1"></i> Admin</span>` 
                     : `<span class="inline-flex items-center px-2.5 py-1.0 rounded-full text-xs font-medium bg-slate-100 text-slate-700"><i class="fas fa-user-tag mr-1"></i> Pengguna</span>`;
-               
+                
                 return `
                     <tr class="hover:bg-slate-50/50">
                         <td class="p-3 font-semibold text-slate-500">${i + 1}</td>
@@ -1082,7 +1283,7 @@
         function updateCartBadge() {
             const badge = document.getElementById('cart-badge');
             const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-           
+            
             if (totalItems > 0) {
                 badge.textContent = totalItems;
                 badge.classList.remove('hidden');
@@ -1094,7 +1295,7 @@
         function renderCart() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
-           
+            
             if (cart.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-12 text-slate-400">
@@ -1129,7 +1330,7 @@
                     </div>
                 `;
             }).join('');
-           
+            
             totalEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
         }
 
@@ -1139,54 +1340,86 @@
             renderCart();
         }
 
-        async function checkout() {
+        // Checkout: Open payment modal with bank info (UPDATED!)
+        function checkout() {
             if (cart.length === 0) {
-                showToast("Keranjang kosong!", "error");
+                showToast("Keranjang Anda masih kosong!", "error");
                 return;
             }
+            
+            // Hide Cart Modal
+            toggleCart();
+            
+            // Populate payment summary
+            const summaryContainer = document.getElementById('payment-items-summary');
+            let total = 0;
+            
+            summaryContainer.innerHTML = cart.map(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                return `
+                    <div class="flex justify-between py-1 border-b border-purple-100/40">
+                        <span class="truncate pr-4">${item.title} (x${item.qty})</span>
+                        <span class="font-semibold shrink-0">Rp ${sub.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('payment-total-amount').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            
+            // Open Payment Modal
+            togglePaymentModal(true);
+        }
 
+        function togglePaymentModal(show) {
+            const modal = document.getElementById('payment-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Submit actual order data to backend (NEW!)
+        async function submitOrder() {
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-           
-            // PERBAIKAN UTAMA: Mengonversi data keranjang belanja menjadi format teks biasa ("sehati (x1)")
-            // agar tersimpan secara rapi, bersih, dan sangat mudah dibaca langsung di spreadsheet order Anda.
             const formattedItemsText = cart.map(item => `${item.title} (x${item.qty})`).join(', ');
 
             const payload = {
                 username: currentUser.username,
-                items: formattedItemsText, // Kirim teks biasa, bukan string JSON mentah
+                items: formattedItemsText, 
                 total: total
             };
 
             if (!APPS_SCRIPT_URL || !APPS_SCRIPT_URL.startsWith("http")) {
                 const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
                 const mockDate = new Date().toISOString().slice(0, 10);
-                MOCK_ORDERS.unshift({ orderId, username: currentUser.username, items: payload.items, total, date: mockDate });
-               
-                showToast("Simulasi Pembayaran Berhasil! Buku digital diproses.", "success");
+                MOCK_ORDERS.unshift({ orderId, username: currentUser.username, items: formattedItemsText, total, date: mockDate });
+                
+                showToast("Konfirmasi Berhasil! Pesanan Anda sedang diproses oleh Admin.", "success");
                 cart = [];
                 updateCartBadge();
-                toggleCart();
+                togglePaymentModal(false);
                 loadOrders();
                 return;
             }
 
             const res = await fetchGAS({ action: "addOrder", payload: payload });
             if (res && res.success) {
-                showToast("Transaksi Berhasil Diproses! Terima kasih.", "success");
+                showToast("Konfirmasi Berhasil! Pesanan Anda sedang diproses oleh Admin.", "success");
                 cart = [];
                 updateCartBadge();
-                toggleCart();
-                // Refresh order admin if currently logged in as admin
-                if (currentUser && currentUser.role === 'admin') {
-                    loadOrders();
-                }
+                togglePaymentModal(false);
+                loadOrders(); // Refresh orders history
             } else {
-                showToast("Gagal melakukan checkout.", "error");
+                showToast("Gagal mengajukan konfirmasi pesanan.", "error");
             }
         }
 
         // ==========================================
-        // 10. ORDER ARCHIVE CONTROLLER (ADMIN)
+        // 10. ORDER ARCHIVE & USER PROFILE CONTROLLER
         // ==========================================
         async function loadOrders() {
             let orderList = [];
@@ -1203,11 +1436,68 @@
             }
 
             orders = orderList;
-            renderOrders();
+            
+            // Render Admin panel history if is admin, otherwise render User history
+            if (currentUser) {
+                if (currentUser.role === 'admin') {
+                    renderOrders();
+                    document.getElementById('stat-total-orders').textContent = orders.length;
+                    const revenue = orders.reduce((sum, o) => sum + parseInt(o.total || 0), 0);
+                    document.getElementById('stat-total-revenue').textContent = `Rp ${revenue.toLocaleString('id-ID')}`;
+                } else {
+                    renderUserOrders();
+                }
+            }
+        }
 
-            document.getElementById('stat-total-orders').textContent = orders.length;
-            const revenue = orders.reduce((sum, o) => sum + parseInt(o.total || 0), 0);
-            document.getElementById('stat-total-revenue').textContent = `Rp ${revenue.toLocaleString('id-ID')}`;
+        // Render User personal shopping history (NEW!)
+        function renderUserOrders() {
+            const tbody = document.getElementById('user-orders-table');
+            if (!tbody) return;
+            
+            // Filter only current user orders
+            const myOrders = orders.filter(o => o.username === currentUser.username);
+            
+            if (myOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Anda belum memiliki riwayat pembelian ebook.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = myOrders.map(o => {
+                let cleanItemsHtml = String(o.items).replace(/\(x(\d+)\)/g, '<span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x$1)</span>');
+                
+                return `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="p-4 font-bold text-slate-500 text-xs">${o.orderId}</td>
+                        <td class="p-4 font-semibold text-slate-800 text-xs sm:text-sm">${cleanItemsHtml}</td>
+                        <td class="p-4 font-bold text-purple-600">Rp ${parseInt(o.total).toLocaleString('id-ID')}</td>
+                        <td class="p-4 text-xs text-slate-500 font-medium">${o.date || '-'}</td>
+                        <td class="p-4 text-center">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <i class="fas fa-hourglass-half mr-1 text-[9px]"></i> Menunggu Verifikasi
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Populate User personal Profile Card details (NEW!)
+        function renderUserProfile() {
+            if (!currentUser) return;
+            
+            document.getElementById('profile-initial').textContent = currentUser.username.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent = currentUser.username;
+            document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'ADMINISTRATOR UTAMA' : 'PENGGUNA VIP PREMIUM';
+            document.getElementById('profile-username-detail').textContent = `@${currentUser.username}`;
+            
+            // Try to match registration date from user DB if matching
+            const matchedUser = users.find(u => u.username === currentUser.username);
+            document.getElementById('profile-date-joined').textContent = matchedUser && matchedUser.date ? matchedUser.date : "2026-06-01 (Hari ini)";
+            
+            // Calculate total user orders count
+            const myOrdersCount = orders.filter(o => o.username === currentUser.username).length;
+            document.getElementById('profile-total-orders-count').textContent = `${myOrdersCount} Transaksi Pesanan`;
         }
 
         function renderOrders() {
@@ -1219,43 +1509,13 @@
             }
 
             tbody.innerHTML = orders.map(o => {
-                let itemsHtml = "";
-                try {
-                    let rawItems = o.items;
-                   
-                    // Cek jika item berupa JSON string (misal data lama)
-                    if (typeof rawItems === 'string' && (rawItems.startsWith('[') || rawItems.startsWith('{'))) {
-                        let parsed = JSON.parse(rawItems);
-                        if (typeof parsed === 'string') {
-                            parsed = JSON.parse(parsed); // Double parsing guard
-                        }
-                       
-                        if (Array.isArray(parsed)) {
-                            itemsHtml = parsed.map(i => `${i.title} <span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x${i.qty})</span>`).join(', ');
-                        } else if (typeof parsed === 'object' && parsed !== null) {
-                            itemsHtml = `${parsed.title || 'Ebook'} <span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x${parsed.qty || 1})</span>`;
-                        } else {
-                            itemsHtml = String(rawItems);
-                        }
-                    } else {
-                        // Jika sudah berformat teks bersih ("sehati (x1)"), bungkus angka (x1) dengan tag badge HTML yang rapi secara otomatis
-                        itemsHtml = String(rawItems).replace(/\(x(\d+)\)/g, '<span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x$1)</span>');
-                    }
-                } catch (e) {
-                    // Fallback pembersihan teks biasa jika parsing gagal
-                    itemsHtml = String(o.items)
-                        .replace(/[\[\]\{\}\"\\]/g, '')
-                        .replace(/title:/g, '')
-                        .replace(/qty:/g, ' x')
-                        .replace(/:/g, '')
-                        .replace(/,/g, ', ');
-                }
+                let itemsHtml = String(o.items).replace(/\(x(\d+)\)/g, '<span class="text-xs text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded-md ml-1">(x$1)</span>');
 
                 return `
                     <tr class="hover:bg-slate-50/50">
                         <td class="p-3 text-xs text-slate-500 font-bold">${o.orderId}</td>
                         <td class="p-3 font-semibold text-slate-800">${o.username}</td>
-                        <td class="p-3 text-xs text-slate-600 font-medium max-w-xs" title="${itemsHtml.replace(/<[^>]*>/g, '')}">${itemsHtml}</td>
+                        <td class="p-3 text-xs text-slate-600 font-medium max-w-xs" title="${o.items}">${itemsHtml}</td>
                         <td class="p-3 font-bold text-emerald-600">Rp ${parseInt(o.total).toLocaleString('id-ID')}</td>
                         <td class="p-3 text-xs text-slate-500 font-medium">${o.date || '-'}</td>
                     </tr>
